@@ -2,6 +2,7 @@ import sys
 from SPARQLWrapper import SPARQLWrapper, JSON
 #import pandas as pd
 import re
+from json import dumps
 
 #Titles without the dates
 endpoint_url = "https://query.wikidata.org/sparql"
@@ -11,7 +12,7 @@ WHERE {
   ?item wdt:P5935 ?id;
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,nl". }
 }
-
+LIMIT 1000
 """
 
 
@@ -26,22 +27,19 @@ def get_results(endpoint_url, query):
 
 results = get_results(endpoint_url, query)
 
-def get_production_label_without_date(results):
-    productions = []
-    for result in results["results"]["bindings"]:
-        production = re.sub(r'\([^)]*\)', '', result["itemLabel"]["value"])
-        productions.append(production)
-    return productions
+def get_production_label_without_date(result):
+    production = re.sub(r'\([^)]*\)', '', result["itemLabel"]["value"])
+    production = production.strip() if production.strip() != "" else None
+    return production
 
-productions = get_production_label_without_date(results)
+productions = [get_production_label_without_date(result) for result in results["results"]["bindings"]]
 
-labels_without_dates =set((productions)) # this is the full set of productions that you get
-#labels_without_dates = set(["label without date 1", "label without date 2", ...])  # this is simply the "set" of unique labels without dates that you get, see also https://www.w3schools.com/python/python_sets.asp; sets do not allow duplicate values
+labels_without_dates = set((productions)) # this is the full set of productions that you get
 production_groups = {label: [] for label in labels_without_dates}  # this will become the dictionary in which you store the groups of productions, c.q. reruns; the key will be the label_without_date, the value will be an array of productions; I used dict comprehension here, see https://docs.python.org/3/tutorial/datastructures.html#dictionaries
 for label in labels_without_dates:
-    for production in productions:
-        production_label_without_date = get_production_label_without_date(results)  # this is some function that gets the label of a production without season info, should be the same code that is used to make labels_without_dates
+    for result in results["results"]["bindings"]:
+        production_label_without_date = get_production_label_without_date(result)  # this is some function that gets the label of a production without season info, should be the same code that is used to make labels_without_dates
         if label == production_label_without_date:
-            production_groups[label].append(production)
+            production_groups[label].append((result["item"]["value"], result["itemLabel"]["value"]))
 
-print(production_groups)
+print(dumps(production_groups, indent=2))
