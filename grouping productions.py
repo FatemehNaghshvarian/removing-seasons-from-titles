@@ -42,4 +42,12 @@ for label in labels_without_dates:
         if label == production_label_without_date:
             production_groups[label].append((result["item"]["value"], result["itemLabel"]["value"]))
 
-print(dumps(production_groups, indent=2))
+#print(dumps(production_groups, indent=2))
+
+for key in production_groups:
+    reruns = []
+    if len(production_groups[key]) > 1:
+        reruns.append(production_groups)
+
+print(dumps(reruns, indent=2))
+
