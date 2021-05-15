@@ -1,10 +1,12 @@
 import sys
 from SPARQLWrapper import SPARQLWrapper, JSON
-#import pandas as pd
+import pandas as pd
 import re
 from json import dumps
 
 #Titles without the dates
+from pandas import DataFrame
+
 endpoint_url = "https://query.wikidata.org/sparql"
 
 query = """SELECT ?item ?itemLabel 
@@ -48,11 +50,20 @@ for label in labels_without_dates:
             production_groups[label]["years"].add(begin_year)
             production_groups[label]["years"].add(end_year)
 
+#for production_group in production_groups:
+    #production = production_groups[production_group]
+    #if len(production["years"]) > 2:  # consider only productions with reruns
+        #print(production_group)
+        #print("\t", production["entities"])
+        #print("\tfrom", min(production["years"]), "until", max(production["years"]))
+g = []
 for production_group in production_groups:
     production = production_groups[production_group]
     if len(production["years"]) > 2:  # consider only productions with reruns
-        print(production_group)
-        print("\t", production["entities"])
-        print("\tfrom", min(production["years"]), "until", max(production["years"]))
+        v = g.append(production["entities"])
+        #df2 = pd.DataFrame("\tfrom", min(production["years"]), "until", max(production["years"]))
+df1 = pd.DataFrame(g)
+#print(df1)
 
+df1.to_csv('df1.csv', index=False)
 
