@@ -4,7 +4,6 @@ import pandas as pd
 import re
 from json import dumps
 
-#Titles without the dates
 from pandas import DataFrame
 
 endpoint_url = "https://query.wikidata.org/sparql"
@@ -27,7 +26,7 @@ def get_results(endpoint_url, query):
     return sparql.query().convert()
 
 
-results = get_results(endpoint_url, query)
+results = get_results(endpoint_url, query) # all the productions save in json format.
 
 def get_production_label_without_date(result):
     season_regex = re.compile(r'\(\d{4}-\d{4}\)')
@@ -38,32 +37,34 @@ def get_production_label_without_date(result):
     production = production.strip() if production.strip() != "" else None
     return (production, begin_year, end_year)
 
-productions_seasons = [get_production_label_without_date(result) for result in results["results"]["bindings"]]
+productions_seasons = [get_production_label_without_date(result) for result in results["results"]["bindings"]] # creating a list of productions and seasons
 
-labels_without_dates = set([ps[0] for ps in productions_seasons]) # this is the full set of productions that you get
+labels_without_dates = set([ps[0] for ps in productions_seasons]) # this is the full set of productions that you get without season info
 production_groups = {label: {"entities": [], "years": set()} for label in labels_without_dates}  # this will become the dictionary in which you store the groups of productions, c.q. reruns; the key will be the label_without_date, the value will be an array of productions; I used dict comprehension here, see https://docs.python.org/3/tutorial/datastructures.html#dictionaries
 for label in labels_without_dates:
     for result in results["results"]["bindings"]:
-        production_label_without_date, begin_year, end_year = get_production_label_without_date(result)  # this is some function that gets the label of a production without season info, should be the same code that is used to make labels_without_dates
+        production_label_without_date, begin_year, end_year = get_production_label_without_date(result)  # this is some function that gets the label of a production without season info,begin date and end date
         if label == production_label_without_date:
             production_groups[label]["entities"].append((result["item"]["value"], result["itemLabel"]["value"]))
             production_groups[label]["years"].add(begin_year)
             production_groups[label]["years"].add(end_year)
 
-#for production_group in production_groups:
-    #production = production_groups[production_group]
-    #if len(production["years"]) > 2:  # consider only productions with reruns
-        #print(production_group)
-        #print("\t", production["entities"])
-        #print("\tfrom", min(production["years"]), "until", max(production["years"]))
-g = []
 for production_group in production_groups:
     production = production_groups[production_group]
     if len(production["years"]) > 2:  # consider only productions with reruns
-        v = g.append(production["entities"])
-        #df2 = pd.DataFrame("\tfrom", min(production["years"]), "until", max(production["years"]))
-df1 = pd.DataFrame(g)
+        print(production_group)
+        print("\t", production["entities"])
+        print("\tfrom", min(production["years"]), "until", max(production["years"]))
+
+#g = []
+#for production_group in production_groups:
+    #production = production_groups[production_group]
+    #if len(production["years"]) > 2:  # consider only productions with reruns
+        #v = g.append(production["entities"])
+        #df2 = pd.DataFrame("\tfrom", min(production["years"]), "until" , max(production["years"]))
+#df1 = pd.DataFrame(g)
 #print(df1)
 
-df1.to_csv('df1.csv', index=False)
+
+#df1.to_csv('df1.csv', index=False)
 
