@@ -39,11 +39,11 @@ def get_production_label_without_date(result):
 
 productions_seasons = [get_production_label_without_date(result) for result in results["results"]["bindings"]] # creating a list of productions and seasons
 
-labels_without_dates = set([ps[0] for ps in productions_seasons]) # this is the full set of productions that you get without season info
-production_groups = {label: {"entities": [], "years": set()} for label in labels_without_dates}  # this will become the dictionary in which you store the groups of productions, c.q. reruns; the key will be the label_without_date, the value will be an array of productions; I used dict comprehension here, see https://docs.python.org/3/tutorial/datastructures.html#dictionaries
+labels_without_dates = set([ps[0] for ps in productions_seasons]) # this is the full set of productions without season info
+production_groups = {label: {"entities": [], "years": set()} for label in labels_without_dates}  # this will become the dictionary in which the groups of productions are stored. It will  contain the reruns; the key will be the label without season information and the value will be an array of productions. 
 for label in labels_without_dates:
     for result in results["results"]["bindings"]:
-        production_label_without_date, begin_year, end_year = get_production_label_without_date(result)  # this is some function that gets the label of a production without season info,begin date and end date
+        production_label_without_date, begin_year, end_year = get_production_label_without_date(result)  
         if label == production_label_without_date:
             production_groups[label]["entities"].append((result["item"]["value"], result["itemLabel"]["value"]))
             production_groups[label]["years"].add(begin_year)
