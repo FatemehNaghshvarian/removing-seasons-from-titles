@@ -1,2 +1,4 @@
-# removing seasons from titles
+# Mapping Kunstenpunt Data to Wikidata: Merging the Re-runs and Removing Season Information from the Titles
+This project revolves around updating Wikidata imports that contained inconsistencies on the instance level, in particular,  the representation of the productions that have re-runs. By re-runs, we mean a touring or revival version of the original production. In Wikidata, the property revival or touring version of (P5328) is used to communicate this information. Not only are the re-runs and original productions not linked, but they also contain the information regarding the year in which they were performed, only in their labels. Although the productions do contain statements describing the date of the first performance, they do not have the end time information as properties. In the context of the FAME project that required semantic access to the name and season information regarding each production, the Wikidata update project was defined. FAME is a metadata enrichment project that aims to use facial recognition technologies to improve metadata creation practices for digital photo and video collections.
+ 
  
